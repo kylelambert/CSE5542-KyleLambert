@@ -1,15 +1,14 @@
 // Kyle Lambert - lambert.448
 
 var scene = new THREE.Scene();
-scene.background = new THREE.Color( 0x002560 );
-scene.fog = new THREE.FogExp2( 0x002560, 0.012 );
+scene.background = new THREE.Color( 0x00422b );
+scene.fog = new THREE.FogExp2( 0x00422b, 0.015 );
 
 var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
 camera.position.set( 0, 0, 18 );
 
 var renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setPixelRatio( window.devicePixelRatio );
-renderer.setSize(1200, 675);
 $('body').append(renderer.domElement);
 
 // Set up the THREE.js Orbit controls so you can move the camera around
@@ -22,7 +21,15 @@ controls.maxDistance = 32;
 controls.maxPolarAngle = Math.PI / 2;
 
 effect = new THREE.StereoEffect(renderer);
-effect.setSize(1200, 675);
+effect.setSize(window.innerWidth, window.innerHeight);
+
+window.addEventListener('resize', onWindowResize, false);
+
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+	effect.setSize( window.innerWidth, window.innerHeight );
+}
 
 // Initialize the unit cube
 var cubeGeometry = new THREE.BoxGeometry(1, 1, 1, 3, 3, 3);
@@ -71,11 +78,11 @@ eye2.translateX(-1);
 var browMaterial = new THREE.MeshBasicMaterial({color: 0xffff00, depthTest: true});
 var eyebrow1 = new THREE.Mesh(cubeGeometry, browMaterial);
 eyebrow1.scale.set(1.5, 0.3, 0.2);
-eyebrow1.translateY(1.75);
+eyebrow1.translateY(2.1);
 eyebrow1.translateZ(1.1);
 var eyebrow2 = eyebrow1.clone();
-eyebrow1.rotateZ(0.35);
-eyebrow2.rotateZ(-0.35);
+//eyebrow1.rotateZ(0.35);
+//eyebrow2.rotateZ(-0.35);
 eyebrow1.translateX(1);
 eyebrow2.translateX(-1);
 
@@ -171,31 +178,44 @@ scene.add(mouth);
 scene.add(floor);
 
 var legRotation = 0;
-var forward = true;
+var legDirection = true;
+var legSpeed = 0.03;
 
-var animate = function() {
+var eyebrowRotation = 0;
+var eyebrowDirection = true;
+var eyebrowSpeed = 0.005;
+
+function animate() {
 
     leftLeg.rotateX(-1 * legRotation);
     rightLeg.rotateX(legRotation);
     
-    if (forward) {
-        legRotation += 0.015;
-        if (legRotation > 1.15) {
-            forward = false;
-        }
+    eyebrow1.rotateZ(eyebrowRotation);
+    eyebrow2.rotateZ(-1 * eyebrowRotation);
+
+    if (legDirection) {
+        legRotation += legSpeed;
+        if (legRotation > 1.15) { legDirection = false; }
     } else {
-        legRotation -= 0.015;
-        if (legRotation < -1.15) {
-            forward = true;
-        }
+        legRotation -= legSpeed;
+        if (legRotation < -1.15) { legDirection = true; }
     }
+
+    if (eyebrowDirection) {
+        eyebrowRotation += eyebrowSpeed;
+        if (eyebrowRotation > 0.35) { eyebrowDirection = false; }
+    } else {
+        eyebrowRotation -= eyebrowSpeed;
+        if (eyebrowRotation < -0.35) { eyebrowDirection = true; }
+    }
+
 
     leftLeg.rotateX(legRotation);
     rightLeg.rotateX(-1 * legRotation);
     
-    //console.log(legRotation);
-    
-    //renderer.render(scene, camera);
+    eyebrow1.rotateZ(-1 * eyebrowRotation);
+    eyebrow2.rotateZ(eyebrowRotation);
+
     requestAnimationFrame(animate);
     controls.update();
     effect.render(scene, camera);
