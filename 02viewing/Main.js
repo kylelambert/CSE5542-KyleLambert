@@ -2,33 +2,41 @@
 
 var scene = new THREE.Scene();
 scene.background = new THREE.Color( 0x00422b );
-scene.fog = new THREE.FogExp2( 0x00422b, 0.015 );
+scene.fog = new THREE.FogExp2( 0x00422b, 0.01 );
 
-var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
-camera.position.set( 0, 0, 18 );
+var cameraLeft = new THREE.PerspectiveCamera(60, (window.innerWidth / 2) / window.innerHeight, 1, 1000);
+cameraLeft.position.set( -0.25, 0, 20 );
+
+var cameraRight = new THREE.PerspectiveCamera(60, (window.innerWidth / 2) / window.innerHeight, 1, 1000);
+cameraRight.position.set( 0.25, 0, 20 );
 
 var renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setPixelRatio( window.devicePixelRatio );
+renderer.setSize(window.innerWidth, window.innerHeight);
 $('body').append(renderer.domElement);
 
-// Set up the THREE.js Orbit controls so you can move the camera around
-controls = new THREE.OrbitControls( camera, renderer.domElement );
-controls.enableDamping = true;
-controls.dampingFactor = 0.25;
-controls.screenSpacePanning = false;
-controls.minDistance = 4;
-controls.maxDistance = 32;
-controls.maxPolarAngle = Math.PI / 2;
-
-effect = new THREE.StereoEffect(renderer);
-effect.setSize(window.innerWidth, window.innerHeight);
+// Set up the THREE.js Orbit controls so you can move the cameras around
+controlsLeft = new THREE.OrbitControls( cameraLeft, renderer.domElement );
+controlsLeft.enableDamping = true;
+controlsLeft.dampingFactor = 0.25;
+controlsLeft.screenSpacePanning = false;
+controlsLeft.minDistance = 10;
+controlsLeft.maxDistance = 40;
+controlsLeft.maxPolarAngle = Math.PI / 2;
+controlsRight = new THREE.OrbitControls( cameraRight, renderer.domElement );
+controlsRight.enableDamping = true;
+controlsRight.dampingFactor = 0.25;
+controlsRight.screenSpacePanning = false;
+controlsRight.minDistance = 10;
+controlsRight.maxDistance = 40;
+controlsRight.maxPolarAngle = Math.PI / 2;
 
 window.addEventListener('resize', onWindowResize, false);
-
 function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-	effect.setSize( window.innerWidth, window.innerHeight );
+    cameraLeft.aspect =  (window.innerWidth / 2) / window.innerHeight;
+    cameraLeft.updateProjectionMatrix();
+    cameraRight.aspect = (window.innerWidth / 2) / window.innerHeight;
+    cameraRight.updateProjectionMatrix();
 }
 
 // Initialize the unit cube
@@ -61,7 +69,7 @@ var floorMaterial = new THREE.MeshBasicMaterial({depthTest: true, color: 0x30303
 var floor = new THREE.Mesh(cubeGeometry, floorMaterial);
 
 // Rotate, scale, and translate the floor plane
-floor.scale.set(1000, 0.2, 1000);
+floor.scale.set(20, 0.1, 20);
 floor.translateY(-3);
 
 // Rotate, scale, and translate the eyes
@@ -81,8 +89,6 @@ eyebrow1.scale.set(1.5, 0.3, 0.2);
 eyebrow1.translateY(2.1);
 eyebrow1.translateZ(1.1);
 var eyebrow2 = eyebrow1.clone();
-//eyebrow1.rotateZ(0.35);
-//eyebrow2.rotateZ(-0.35);
 eyebrow1.translateX(1);
 eyebrow2.translateX(-1);
 
@@ -185,7 +191,12 @@ var eyebrowRotation = 0;
 var eyebrowDirection = true;
 var eyebrowSpeed = 0.005;
 
+var floorPos = floor.position;
+
 function animate() {
+
+    var cameraPos = cameraLeft.position;
+    floor.position = new THREE.Vector3(cameraPos.x, cameraPos.y, floorPos.z);
 
     leftLeg.rotateX(-1 * legRotation);
     rightLeg.rotateX(legRotation);
@@ -216,9 +227,19 @@ function animate() {
     eyebrow1.rotateZ(-1 * eyebrowRotation);
     eyebrow2.rotateZ(eyebrowRotation);
 
+    renderer.setScissorTest( true );
+    renderer.setScissor( 0, 0, window.innerWidth / 2, window.innerHeight );
+    renderer.setViewport( 0, 0, window.innerWidth / 2, window.innerHeight );
+    renderer.render( scene, cameraLeft );
+
+    renderer.setScissor( window.innerWidth / 2, 0, window.innerWidth / 2, window.innerHeight );
+    renderer.setViewport( window.innerWidth / 2, 0, window.innerWidth / 2, window.innerHeight );
+    renderer.render( scene, cameraRight );
+    renderer.setScissorTest( false );
+
     requestAnimationFrame(animate);
-    controls.update();
-    effect.render(scene, camera);
+    controlsLeft.update();
+    controlsRight.update();
 }
 
 animate();
