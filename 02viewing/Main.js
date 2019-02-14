@@ -2,7 +2,7 @@
 
 var scene = new THREE.Scene();
 scene.background = new THREE.Color( 0x00422b );
-scene.fog = new THREE.FogExp2( 0x00422b, 0.01 );
+scene.fog = new THREE.FogExp2( 0x00422b, 0.005 );
 
 var cameraLeft = new THREE.PerspectiveCamera(60, (window.innerWidth / 2) / window.innerHeight, 1, 1000);
 cameraLeft.position.set( -0.25, 0, 20 );
@@ -64,13 +64,13 @@ var torusGeometry = new THREE.TorusGeometry(0.5, 0.15, 10, 20);
 var torusMaterial = new THREE.MeshBasicMaterial({color: 0xff882d, depthTest: true});
 var bigEar1 = new THREE.Mesh(torusGeometry, torusMaterial);
 
-// Initialize the unit plane
-var floorMaterial = new THREE.MeshBasicMaterial({depthTest: true, color: 0x303030});
+// Initialize the floor
+var floorMaterial = new THREE.MeshBasicMaterial({depthTest: true, color: 0x606060});
 var floor = new THREE.Mesh(cubeGeometry, floorMaterial);
 
 // Rotate, scale, and translate the floor plane
-floor.scale.set(20, 0.1, 20);
-floor.translateY(-3);
+floor.scale.set(5000, 0.1, 5000);
+floor.translateY(-2.85);
 
 // Rotate, scale, and translate the eyes
 var eye1 = new THREE.Mesh(coneGeometry, coneMaterial);
