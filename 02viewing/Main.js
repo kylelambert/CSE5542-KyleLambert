@@ -1,12 +1,12 @@
 // Kyle Lambert - lambert.448
 
 var scene = new THREE.Scene();
-scene.background = new THREE.Color( 0x00422b );
-scene.fog = new THREE.FogExp2( 0x00422b, 0.005 );
+scene.background = new THREE.Color( 0x00422b );     // Green surrounding sky
+scene.fog = new THREE.FogExp2( 0x00422b, 0.005 );   // Fog in all directions
 
+// Create separate cameras for each eye, 0.5 apart from one another
 var cameraLeft = new THREE.PerspectiveCamera(60, (window.innerWidth / 2) / window.innerHeight, 1, 1000);
 cameraLeft.position.set( -0.25, 0, 20 );
-
 var cameraRight = new THREE.PerspectiveCamera(60, (window.innerWidth / 2) / window.innerHeight, 1, 1000);
 cameraRight.position.set( 0.25, 0, 20 );
 
@@ -16,14 +16,14 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 $('body').append(renderer.domElement);
 
 // Set up the THREE.js Orbit controls so you can move the cameras around
-controlsLeft = new THREE.OrbitControls( cameraLeft, renderer.domElement );
+controlsLeft = new THREE.OrbitControls( cameraLeft, renderer.domElement );  // left eye camera controls
 controlsLeft.enableDamping = true;
 controlsLeft.dampingFactor = 0.25;
 controlsLeft.screenSpacePanning = false;
 controlsLeft.minDistance = 10;
 controlsLeft.maxDistance = 40;
 controlsLeft.maxPolarAngle = Math.PI / 2;
-controlsRight = new THREE.OrbitControls( cameraRight, renderer.domElement );
+controlsRight = new THREE.OrbitControls( cameraRight, renderer.domElement ); // right eye camera controls
 controlsRight.enableDamping = true;
 controlsRight.dampingFactor = 0.25;
 controlsRight.screenSpacePanning = false;
@@ -31,6 +31,8 @@ controlsRight.minDistance = 10;
 controlsRight.maxDistance = 40;
 controlsRight.maxPolarAngle = Math.PI / 2;
 
+// Function to resize the scene to the browser size if the user changes the
+// browser size while the scene is open
 window.addEventListener('resize', onWindowResize, false);
 function onWindowResize() {
     cameraLeft.aspect =  (window.innerWidth / 2) / window.innerHeight;
@@ -65,11 +67,11 @@ var torusMaterial = new THREE.MeshBasicMaterial({color: 0xff882d, depthTest: tru
 var bigEar1 = new THREE.Mesh(torusGeometry, torusMaterial);
 
 // Initialize the floor
-var floorMaterial = new THREE.MeshBasicMaterial({depthTest: true, color: 0x606060});
+var floorMaterial = new THREE.MeshBasicMaterial({depthTest: true, color: 0x303030});
 var floor = new THREE.Mesh(cubeGeometry, floorMaterial);
 
 // Rotate, scale, and translate the floor plane
-floor.scale.set(5000, 0.1, 5000);
+floor.scale.set(10000, 0.1, 10000);
 floor.translateY(-2.85);
 
 // Rotate, scale, and translate the eyes
@@ -147,24 +149,24 @@ tinyEar1.translateZ(3.9);
 tinyEar2.translateZ(-3.9);
 
 // Create groups
-var leftLeg = new THREE.Group();
+var leftLeg = new THREE.Group();    // Left leg group
 leftLeg.add(leg2);
 leftLeg.add(foot2);
 
-var rightLeg = new THREE.Group();
+var rightLeg = new THREE.Group();   // Right leg group
 rightLeg.add(leg1);
 rightLeg.add(foot1);
 
-var hat = new THREE.Group();
+var hat = new THREE.Group();        // Hat group
 hat.add(hatBottom);
 hat.add(hatTop);
 
-var leftEar = new THREE.Group();
+var leftEar = new THREE.Group();    // Left ear group
 leftEar.add(bigEar1);
 leftEar.add(midEar1);
 leftEar.add(tinyEar1);
 
-var rightEar = new THREE.Group();
+var rightEar = new THREE.Group();   // Right ear group
 rightEar.add(bigEar2);
 rightEar.add(midEar2);
 rightEar.add(tinyEar2);
@@ -183,63 +185,68 @@ scene.add(eyebrow2);
 scene.add(mouth);
 scene.add(floor);
 
+// For moving the legs
 var legRotation = 0;
 var legDirection = true;
 var legSpeed = 0.03;
 
+// For moving the eyebrows
 var eyebrowRotation = 0;
 var eyebrowDirection = true;
 var eyebrowSpeed = 0.005;
 
-var floorPos = floor.position;
-
 function animate() {
 
-    var cameraPos = cameraLeft.position;
-    floor.position = new THREE.Vector3(cameraPos.x, cameraPos.y, floorPos.z);
-
+    // Move legs and eyebrows back to original positions
     leftLeg.rotateX(-1 * legRotation);
     rightLeg.rotateX(legRotation);
-    
     eyebrow1.rotateZ(eyebrowRotation);
     eyebrow2.rotateZ(-1 * eyebrowRotation);
 
+    // Increase leg position in the current direction
     if (legDirection) {
         legRotation += legSpeed;
+        // Switch the leg movement direction after passing this distance
         if (legRotation > 1.15) { legDirection = false; }
     } else {
         legRotation -= legSpeed;
+        // Switch the leg movement direction after passing this distance
         if (legRotation < -1.15) { legDirection = true; }
     }
 
+    // Increase eyebrow rotation in the current direction
     if (eyebrowDirection) {
         eyebrowRotation += eyebrowSpeed;
+        // Switch the eyebrow rotation direction after passing this distance
         if (eyebrowRotation > 0.35) { eyebrowDirection = false; }
     } else {
         eyebrowRotation -= eyebrowSpeed;
+        // Switch the eyebrow rotation direction after passing this distance
         if (eyebrowRotation < -0.35) { eyebrowDirection = true; }
     }
 
-
+    // Apply the new rotations to the legs and eyebrows
     leftLeg.rotateX(legRotation);
     rightLeg.rotateX(-1 * legRotation);
-    
     eyebrow1.rotateZ(-1 * eyebrowRotation);
     eyebrow2.rotateZ(eyebrowRotation);
 
+    // Cut the screen into 2 to allow for both cameras
     renderer.setScissorTest( true );
+    // Set up left eye camera
     renderer.setScissor( 0, 0, window.innerWidth / 2, window.innerHeight );
     renderer.setViewport( 0, 0, window.innerWidth / 2, window.innerHeight );
-    renderer.render( scene, cameraLeft );
+    renderer.render( scene, cameraLeft );   
 
+    // Set up right eye camera
     renderer.setScissor( window.innerWidth / 2, 0, window.innerWidth / 2, window.innerHeight );
     renderer.setViewport( window.innerWidth / 2, 0, window.innerWidth / 2, window.innerHeight );
     renderer.render( scene, cameraRight );
     renderer.setScissorTest( false );
 
     requestAnimationFrame(animate);
-    controlsLeft.update();
-    controlsRight.update();
+    controlsLeft.update();      // OrbitControls for left eye
+    controlsRight.update();     // OrbitControls for right eye
 }
 
 animate();
