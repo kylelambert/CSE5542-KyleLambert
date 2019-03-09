@@ -1,20 +1,16 @@
 Kyle Lambert (lambert.448)
-CSE 5542 - Assignment 2
-February 15, 2019
+CSE 5542 - Assignment 3
+March 9, 2019
 
-All of my own code is in Main.js and 02viewing-KyleLambert.html. 
-To run the lab, just open 02viewing-KyleLambert.html in a browser.
+All of my code is in Main.js and 03model-KyleLambert.html. 
+To run the lab, just open 03model-KyleLambert.html in a browser. Then there
+is a button in the upper right corner of the page where you must specify there
+"grammar.txt" file. After loading the text file, then the L-system will be generated.
 
-For this project, I used WebGL along with THREE.js to create the scene.
-The scene consists of 2 Perspective Cameras, one for each eye. There is
-an "infinite" plane underneath the robot as well as fog in every direction
-so the area looks endless.  
+You can change the rules in the "grammar.txt" file but they must follow the same format.
+The first line must be the number of generations.
+The second line must be the angle of rotation.
+The third line must be the starting symbol of the production.
+Every subsequent line must be a production rule with no spaces between the symbol and '=' sign.
 
-After asking Prof. Chen, I used THREE.js's OrbitControls so you can move
-around the scene easily. Holding Left Mouse Button allows you to rotate 
-around the robot. Holding Right Mouse Button allows you to pan around 
-the screen. Using the scroll wheel zooms in and out. 
-
-For the extra credit, I made a walk animation for the robot. It walks in
-place by moving its legs back and forth. Its eyebrows also change so its
-expression changes from sad to mad. 
+For example, F=FF will work but F = FF will NOT work, so you must follow the format correctly.

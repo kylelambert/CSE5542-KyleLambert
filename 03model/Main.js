@@ -1,27 +1,19 @@
 // Kyle Lambert - lambert.448
 
 var camera, scene, renderer;
-var numGenerations, rotationAngle, productionString, rules;
+var numGenerations = 0, rotationAngle = 0, productionString = "", rules = [];
 var twigLength = 6;
 
-init();
-animate();
-
 window.addEventListener('resize', onWindowResize, false);
+document.getElementById('file-input').addEventListener('change', readSingleFile, false);
 
 function init() {
-    
-    numGenerations = 6;
-    rotationAngle = 22.5;
-    productionString = "X";
-    rules = ["X=F-[[X]+X]+F[+FX]-X", "F=FF"];
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x00422b );     // Green surrounding sky
 
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.set( 0, 0, (numGenerations * 100)/2.5 );
-
+    camera.position.set( 0, 0, (numGenerations * 100) / 2.5 );
     renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -38,14 +30,13 @@ function init() {
     
     // Create full production string over all generations
     for (var i = 0; i < numGenerations; i++) {
-        for (var j = 0; j < rules.length; j++) {
+        for (var j = 0; j < rules.length; j++) {    // Progress through every rule
             var search = rules[j].substr(0,1);
             var replacement = rules[j].substr(2);
             productionString = productionString.replace(new RegExp(search, 'g'), replacement);
         }
-        twigLength *= 0.7;
+        twigLength *= 0.7;  // Twigs decrease in length by 70% over each generation
     }
-    console.log(productionString);
 
     // Initialize the unit cube
     var cubeGeometry = new THREE.BoxGeometry(0.25, twigLength, 0.1, 3, 3, 3);
@@ -58,34 +49,35 @@ function init() {
     var previousY = twigLength/2;
     var previousX = 0;
 
-    var positionStack = [];
-    var rotationStack = [];
-    var widthStack = [];
-    var heightStack = [];
+    var positionStack = [];     // stack for current position
+    var rotationStack = [];     // stack for current rotation  
+    var widthStack = [];        // stack for current X length for translation
+    var heightStack = [];       // stack for current Y length for translation
 
     for (var i = 0; i < productionString.length; i++) {
         if (productionString.charAt(i) == "F") {
             var newStick = stick.clone();
             newStick.position.set(currentPosition.x, currentPosition.y, currentPosition.z);
 
-            newStick.translateX(previousX + (twigLength/2)*-1*Math.sin(currentRotation * (3.1415926 / 180)));
-            newStick.translateY(previousY + (twigLength/2)*Math.cos(currentRotation * (3.1415926 / 180)));
-            newStick.rotateZ(currentRotation * (3.1415926 / 180));
+            // Correctly position the new twig
+            newStick.translateX(previousX + (twigLength/2) * -1 * Math.sin(currentRotation * (Math.PI / 180)));
+            newStick.translateY(previousY + (twigLength/2) * Math.cos(currentRotation * (Math.PI / 180)));
+            newStick.rotateZ(currentRotation * (Math.PI / 180));
 
             currentPosition = newStick.position;
-            previousY = (twigLength/2)*Math.cos(currentRotation * (3.1415926 / 180));
-            previousX = (twigLength/2)*-1*Math.sin(currentRotation * (3.1415926 / 180));
+            previousY = (twigLength/2) * Math.cos(currentRotation * (Math.PI / 180));
+            previousX = (twigLength/2) * -1 * Math.sin(currentRotation * (Math.PI / 180));
             scene.add(newStick);
-        } else if (productionString.charAt(i) == "+") {
+        } else if (productionString.charAt(i) == "+") { // increase rotation angle
             currentRotation += rotationAngle;
-        } else if (productionString.charAt(i) == "-") {
+        } else if (productionString.charAt(i) == "-") { // decrease rotation angle
             currentRotation -= rotationAngle;
-        } else if (productionString.charAt(i) == "[") {
+        } else if (productionString.charAt(i) == "[") { // push current state onto the stack
             positionStack.push(currentPosition);
             rotationStack.push(currentRotation);
             widthStack.push(previousX);
             heightStack.push(previousY);
-        } else if (productionString.charAt(i) == "]") {
+        } else if (productionString.charAt(i) == "]") { // pop current state off top of the stack
             currentPosition = positionStack.pop();
             currentRotation = rotationStack.pop();
             previousX = widthStack.pop();
@@ -108,4 +100,36 @@ function animate() {
 
     requestAnimationFrame(animate);
     controls.update();      // OrbitControls
+}
+
+// Loads the file specified by the user
+function readSingleFile(e) {
+    var file = e.target.files[0];
+    if (!file) {
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var contents = e.target.result;
+        // Display file content
+        setRules(contents);     // sets production rules
+        init();     // produces the L-system generation
+        animate();
+    };
+    reader.readAsText(file);
+}
+
+var ruleEntry = 0;
+// Function to set the production rules before production begins
+function setRules(contents) {
+    var lines = contents.split(/[\r\n]+/g);
+
+    numGenerations = parseInt(lines[0]);
+    rotationAngle = parseFloat(lines[1]);
+    productionString = lines[2];
+
+    for (var i = 3; i < lines.length; i++) { 
+        rules[ruleEntry] = lines[i];
+        ruleEntry++;
+    }
 }
