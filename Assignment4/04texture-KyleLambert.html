@@ -1,0 +1,44 @@
+<html>
+    <head>
+        <script src="Libraries/jquery-3.3.1.min.js"></script>
+        <title>Kyle Lambert - 04 Textures</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#777;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #353535;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				z-index:1000;
+			}
+		</style>
+    </head>
+    <body onload="init();">
+		<div id="info">Kyle Lambert - 04 Textures</div>
+		<canvas id="game-surface" width="1200" height="675">
+			Your browser does not support HTML5
+		</canvas>
+		<img id="box-image" src="Textures/box.png" width="0" height="0"></img>
+		<img id="aku-image" src="Textures/aku.png" width="0" height="0"></img>
+		<img id="life-image" src="Textures/life.png" width="0" height="0"></img>
+		<img id="nitro-image" src="Textures/nitro.png" width="0" height="0"></img>
+		<img id="tnt-image" src="Textures/tnt.png" width="0" height="0"></img>
+		<img id="question-image" src="Textures/question.png" width="0" height="0"></img>
+		<script src="Libraries/util.js"></script>
+		<script src="Libraries/gl-matrix.js"></script>
+        <script src="Libraries/three.min.js"></script>
+        <script src="Libraries/OrbitControls.js"></script>
+        <script src="main.js"></script>
+    </body>
+</html>
