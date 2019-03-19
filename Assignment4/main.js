@@ -248,7 +248,7 @@ var start = function (vertexShaderText, fragmentShaderText) {
 	);
 	gl.bindTexture(gl.TEXTURE_2D, null);
 
-    var textures = [boxTexture, akuTexture, lifeTexture, nitroTexture, tntTexture, questionTexture];
+    var textures = [nitroTexture, boxTexture, tntTexture, akuTexture, questionTexture, lifeTexture];
 
 	// Tell OpenGL state machine which program should be active.
 	gl.useProgram(program);
@@ -286,27 +286,12 @@ var start = function (vertexShaderText, fragmentShaderText) {
 
         gl.clearColor(0.85, 0.6, 0.7, 1.0);
 		gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-
-        //console.log(boxIndices.length)
-
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, textures[0]);
-        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
-
-        gl.bindTexture(gl.TEXTURE_2D, textures[1]);
-        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 6);
-
-        gl.bindTexture(gl.TEXTURE_2D, textures[2]);
-        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 12);
-
-        gl.bindTexture(gl.TEXTURE_2D, textures[3]);
-        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 18);
-
-        gl.bindTexture(gl.TEXTURE_2D, textures[4]);
-        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 24);
-
-        gl.bindTexture(gl.TEXTURE_2D, textures[5]);
-        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 30);
+		
+		for (var i = 0; i < 6; i++) {
+			gl.activeTexture(gl.TEXTURE0);
+			gl.bindTexture(gl.TEXTURE_2D, textures[i]);
+			gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 6*i*2);
+		}
 
 		requestAnimationFrame(loop);
 	};
