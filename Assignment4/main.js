@@ -74,40 +74,40 @@ var start = function (vertexShaderText, fragmentShaderText) {
 	var boxVertices = 
 	[ // X, Y, Z           U, V
 		// Top
-		-1.0, 1.0, -1.0,   0, 0,
-		-1.0, 1.0, 1.0,    0, 1,
-		1.0, 1.0, 1.0,     1, 1,
-		1.0, 1.0, -1.0,    1, 0,
+		-4.0, 1.0, -1.0,   0, 0,
+		-4.0, 1.0, 1.0,    0, 1,
+		-2.0, 1.0, 1.0,     1, 1,
+		-2.0, 1.0, -1.0,    1, 0,
 
 		// Left
-		-1.0, 1.0, 1.0,    0, 0,
-		-1.0, -1.0, 1.0,   1, 0,
-		-1.0, -1.0, -1.0,  1, 1,
-		-1.0, 1.0, -1.0,   0, 1,
+		-4.0, 1.0, 1.0,    0, 0,
+		-4.0, -1.0, 1.0,   1, 0,
+		-4.0, -1.0, -1.0,  1, 1,
+		-4.0, 1.0, -1.0,   0, 1,
 
 		// Right
-		1.0, 1.0, 1.0,    1, 1,
-		1.0, -1.0, 1.0,   0, 1,
-		1.0, -1.0, -1.0,  0, 0,
-		1.0, 1.0, -1.0,   1, 0,
+		-2.0, 1.0, 1.0,    1, 1,
+		-2.0, -1.0, 1.0,   0, 1,
+		-2.0, -1.0, -1.0,  0, 0,
+		-2.0, 1.0, -1.0,   1, 0,
 
 		// Front
-		1.0, 1.0, 1.0,    1, 1,
-		1.0, -1.0, 1.0,    1, 0,
-		-1.0, -1.0, 1.0,    0, 0,
-		-1.0, 1.0, 1.0,    0, 1,
+		-2.0, 1.0, 1.0,    1, 1,
+		-2.0, -1.0, 1.0,    1, 0,
+		-4.0, -1.0, 1.0,    0, 0,
+		-4.0, 1.0, 1.0,    0, 1,
 
 		// Back
-		1.0, 1.0, -1.0,    0, 0,
-		1.0, -1.0, -1.0,    0, 1,
-		-1.0, -1.0, -1.0,    1, 1,
-		-1.0, 1.0, -1.0,    1, 0,
+		-2.0, 1.0, -1.0,    0, 0,
+		-2.0, -1.0, -1.0,    0, 1,
+		-4.0, -1.0, -1.0,    1, 1,
+		-4.0, 1.0, -1.0,    1, 0,
 
 		// Bottom
-		-1.0, -1.0, -1.0,   1, 1,
-		-1.0, -1.0, 1.0,    1, 0,
-		1.0, -1.0, 1.0,     0, 0,
-		1.0, -1.0, -1.0,    0, 1,
+		-4.0, -1.0, -1.0,   1, 1,
+		-4.0, -1.0, 1.0,    1, 0,
+		-2.0, -1.0, 1.0,     0, 0,
+		-2.0, -1.0, -1.0,    0, 1,
 	];
 
 	var boxIndices =
@@ -261,7 +261,7 @@ var start = function (vertexShaderText, fragmentShaderText) {
 	var viewMatrix = new Float32Array(16);
 	var projMatrix = new Float32Array(16);
 	mat4.identity(worldMatrix);
-	mat4.lookAt(viewMatrix, [0, 0, -8], [0, 0, 0], [0, 1, 0]);
+	mat4.lookAt(viewMatrix, [0, 0, -9], [0, 0, 0], [0, 1, 0]);
 	mat4.perspective(projMatrix, glMatrix.toRadian(45), canvas.clientWidth / canvas.clientHeight, 0.1, 1000.0);
 
 	gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
@@ -279,9 +279,11 @@ var start = function (vertexShaderText, fragmentShaderText) {
 	var angle = 0;
 	var loop = function () {
 		angle = performance.now() / 1000 / 6 * 2 * Math.PI;
+		mat4.translate(identityMatrix, identityMatrix, [3, 0, 0]);
 		mat4.rotate(yRotationMatrix, identityMatrix, angle, [0, 1, 0]);
 		mat4.rotate(xRotationMatrix, identityMatrix, angle / 4, [1, 0, 0]);
 		mat4.mul(worldMatrix, yRotationMatrix, xRotationMatrix);
+		mat4.translate(identityMatrix, identityMatrix, [-3, 0, 0]);
 		gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
 
         gl.clearColor(0.85, 0.6, 0.7, 1.0);
